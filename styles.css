@@ -436,16 +436,28 @@ input, select {
   }
 
   .pager {
-    gap: 4px;
+    gap: 6px;
     padding: 4px 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
   }
 
   .pager__info {
     font-size: 11px;
+    white-space: nowrap;
+  }
+
+  .pager__controls {
+    display: flex;
+    gap: 4px;
+    flex-wrap: nowrap;
   }
 
   .pager__size label {
     font-size: 11px;
+    white-space: nowrap;
   }
 
   .actions {
