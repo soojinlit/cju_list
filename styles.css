@@ -427,36 +427,41 @@ input, select {
 
 @media (max-width: 520px) {
   .bottom-bar {
-    gap: 8px;
-    padding: 8px 10px;
+    gap: 4px;
+    padding: 4px 6px;
   }
 
   .bottom-left {
-    gap: 6px;
+    gap: 4px;
   }
 
   .pager {
-    gap: 6px;
-    padding: 8px 10px;
+    gap: 4px;
+    padding: 4px 6px;
   }
 
   .pager__info {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .pager__size label {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .actions {
-    gap: 6px;
+    gap: 4px;
   }
 
   .primary,
   .ghost {
-    padding: 6px 10px;
-    border-radius: 10px;
-    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+  }
+
+  .pager__size select {
+    padding: 4px 6px;
+    font-size: 11px;
   }
 }
 
