@@ -6,6 +6,7 @@
   pageSize: 50,
   sortBy: "default",
   ratingFilter: "all",
+  indexFilter: "all",
   activeItemId: null,
   version: 1,
 };
@@ -28,6 +29,7 @@ const els = {
   pageSize: document.getElementById("page-size"),
   sortBy: document.getElementById("sort-by"),
   ratingFilter: document.getElementById("rating-filter"),
+  indexBar: document.getElementById("index-bar"),
   modal: document.getElementById("detail-modal"),
   modalClose: document.getElementById("detail-close"),
   modalBackdrop: document.querySelector(".modal__backdrop"),
@@ -75,6 +77,7 @@ function saveLocal() {
       pageSize: state.pageSize,
       sortBy: state.sortBy,
       ratingFilter: state.ratingFilter,
+      indexFilter: state.indexFilter,
     })
   );
 }
@@ -97,6 +100,10 @@ function getFilteredItems() {
     if (state.ratingFilter !== "all") {
       const min = Number(state.ratingFilter);
       if (!item.rating || item.rating < min) return false;
+    }
+    if (state.indexFilter !== "all") {
+      const init = getTitleInitial(item.title);
+      if (init !== state.indexFilter) return false;
     }
     if (!query) return true;
     return (item.title + " " + item.author).toLowerCase().includes(query);
@@ -128,6 +135,24 @@ function statusLabel(status) {
   if (status === "reading") return "읽는 중";
   if (status === "dnf") return "DNF";
   return "TBR";
+}
+
+function getTitleInitial(title) {
+  if (!title) return "";
+  const ch = title.trim()[0];
+  if (!ch) return "";
+  const code = ch.charCodeAt(0);
+  // Hangul syllables
+  if (code >= 0xac00 && code <= 0xd7a3) {
+    const cho = Math.floor((code - 0xac00) / 28 / 21);
+    const chos = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+    return chos[cho] || "";
+  }
+  // Latin letters
+  if (/[A-Za-z]/.test(ch)) return ch.toUpperCase();
+  // Digits
+  if (/[0-9]/.test(ch)) return ch;
+  return "";
 }
 
 function render() {
@@ -314,9 +339,11 @@ async function loadData() {
     if (local.pageSize) state.pageSize = local.pageSize;
     if (local.sortBy) state.sortBy = local.sortBy;
     if (local.ratingFilter) state.ratingFilter = local.ratingFilter;
+    if (local.indexFilter) state.indexFilter = local.indexFilter;
     els.pageSize.value = String(state.pageSize);
     els.sortBy.value = state.sortBy;
     els.ratingFilter.value = state.ratingFilter;
+    buildIndexBar();
     render();
     return;
   }
@@ -328,7 +355,33 @@ async function loadData() {
   els.pageSize.value = String(state.pageSize);
   els.sortBy.value = state.sortBy;
   els.ratingFilter.value = state.ratingFilter;
+  buildIndexBar();
   render();
+}
+
+function buildIndexBar() {
+  if (!els.indexBar) return;
+  els.indexBar.innerHTML = "";
+  const digits = ["0","1","2","3","4","5","6","7","8","9"];
+  const han = ["ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ"];
+  const alpha = Array.from({ length: 26 }, (_, i) => String.fromCharCode(65 + i));
+  const all = ["all", ...han, ...alpha, ...digits];
+  all.forEach(key => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "index-btn";
+    btn.dataset.key = key;
+    btn.textContent = key === "all" ? "전체" : key;
+    if (key === state.indexFilter) btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      state.indexFilter = key;
+      state.page = 1;
+      saveLocal();
+      buildIndexBar();
+      render();
+    });
+    els.indexBar.appendChild(btn);
+  });
 }
 
 function showPanel(panel, show) {
