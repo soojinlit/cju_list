@@ -186,6 +186,38 @@ h1 {
   background: white;
 }
 
+.index-wrap {
+  display: grid;
+  gap: 6px;
+}
+
+.index-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.index-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.index-btn {
+  border: 1px solid var(--border);
+  background: white;
+  color: var(--muted);
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.index-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
 .actions {
   display: flex;
   gap: 8px;
