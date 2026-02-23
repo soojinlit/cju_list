@@ -1,0 +1,251 @@
+﻿<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>내 TBR 라이브러리</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Serif+KR:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <div>
+        <div class="eyebrow">Personal Reading OS</div>
+        <h1>CJU신청도서</h1>
+        <p class="subtitle">도서관에 신청한 것 알차게 다 읽어보자!</p>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat">
+          <div class="stat__label">전체</div>
+          <div class="stat__value" id="stat-total">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">완독</div>
+          <div class="stat__value" id="stat-done">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">읽는 중</div>
+          <div class="stat__value" id="stat-reading">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat__label">DNF</div>
+          <div class="stat__value" id="stat-dnf">0</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="toolbar">
+      <div class="filters" role="tablist" aria-label="상태 필터">
+        <button class="filter active" data-filter="all">전체</button>
+        <button class="filter" data-filter="tbr">TBR</button>
+        <button class="filter" data-filter="reading">읽는 중</button>
+        <button class="filter" data-filter="done">완독</button>
+        <button class="filter" data-filter="dnf">DNF</button>
+      </div>
+      <div class="sort">
+        <label for="sort-by">정렬</label>
+        <select id="sort-by">
+          <option value="default" selected>기본</option>
+          <option value="title-asc">제목 순</option>
+          <option value="author-asc">저자 순</option>
+          <option value="rating-desc">별점 높은 순</option>
+          <option value="rating-asc">별점 낮은 순</option>
+        </select>
+      </div>
+      <div class="sort">
+        <label for="rating-filter">별점 필터</label>
+        <select id="rating-filter">
+          <option value="all" selected>전체</option>
+          <option value="4.5">4.5+</option>
+          <option value="4">4+</option>
+          <option value="3.5">3.5+</option>
+          <option value="3">3+</option>
+          <option value="2.5">2.5+</option>
+        </select>
+      </div>
+      <div class="search">
+        <input id="search" type="search" placeholder="제목, 저자 검색" />
+      </div>
+      <div class="actions">
+        <button id="btn-add" class="primary">책 추가</button>
+      </div>
+    </section>
+
+    <section id="add-panel" class="panel hidden">
+      <h2>새 책 추가</h2>
+      <div class="form-grid">
+        <label>
+          제목
+          <input id="add-title" type="text" placeholder="책 제목" />
+        </label>
+        <label>
+          저자
+          <input id="add-author" type="text" placeholder="저자" />
+        </label>
+        <label>
+          상태
+          <select id="add-status">
+            <option value="tbr">TBR</option>
+            <option value="reading">읽는 중</option>
+            <option value="done">완독</option>
+            <option value="dnf">DNF</option>
+          </select>
+        </label>
+      </div>
+      <div class="panel-actions">
+        <button id="btn-add-save" class="primary">추가하기</button>
+        <button id="btn-add-cancel" class="ghost">닫기</button>
+      </div>
+    </section>
+
+    <section id="settings-panel" class="panel hidden">
+      <h2>GitHub 저장 설정</h2>
+      <p class="panel-help">GitHub Pages를 사용하면 모바일에서도 동일한 목록을 볼 수 있어요. 저장은 GitHub API로 직접 커밋됩니다.</p>
+      <div class="form-grid">
+        <label>
+          GitHub 사용자명
+          <input id="gh-owner" type="text" placeholder="username" />
+        </label>
+        <label>
+          저장소 이름
+          <input id="gh-repo" type="text" placeholder="repo" />
+        </label>
+        <label>
+          파일 경로
+          <input id="gh-path" type="text" value="data/books.json" />
+        </label>
+        <label>
+          Personal Access Token
+          <input id="gh-token" type="password" placeholder="ghp_..." />
+        </label>
+      </div>
+      <div class="panel-actions">
+        <button id="btn-save-settings" class="primary">설정 저장</button>
+        <button id="btn-save-github" class="ghost">GitHub에 저장</button>
+        <button id="btn-settings-close" class="ghost">닫기</button>
+      </div>
+      <div id="save-status" class="save-status"></div>
+    </section>
+
+    <section class="list" id="book-list"></section>
+
+    <section class="bottom-bar">
+      <div class="bottom-left">
+        <div class="actions">
+          <button id="btn-export" class="ghost">Markdown 내보내기</button>
+          <button id="btn-settings" class="ghost">GitHub 저장 설정</button>
+        </div>
+        <section class="pager" id="pager">
+          <div class="pager__info" id="pager-info">0 / 0</div>
+          <div class="pager__controls">
+            <button id="pager-prev" class="ghost">이전</button>
+            <button id="pager-next" class="ghost">다음</button>
+          </div>
+          <div class="pager__size">
+            <label for="page-size">페이지 크기</label>
+            <select id="page-size">
+              <option value="30">30</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <template id="book-card-template">
+    <article class="book-card">
+      <div class="book-body">
+        <div class="book-main">
+          <div class="book-title"></div>
+          <div class="book-author"></div>
+        </div>
+        <div class="book-extra">
+          <div class="book-date"></div>
+          <div class="book-notes"></div>
+          <div class="book-rating"></div>
+        </div>
+        <div class="book-meta">
+          <div class="status-pill"></div>
+          <div class="meta-actions">
+            <button class="open-detail ghost">상세</button>
+          </div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <section id="detail-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="detail-heading">
+    <div class="modal__backdrop" data-close="true"></div>
+    <div class="modal__panel">
+      <div class="modal__header">
+        <h2 id="detail-heading">책 기록</h2>
+        <button class="ghost" id="detail-close">닫기</button>
+      </div>
+      <div class="modal__body">
+        <div class="detail-grid">
+          <div class="detail-info">
+            <div class="detail-row">
+              <label for="detail-title">제목</label>
+              <input id="detail-title" type="text" />
+            </div>
+            <div class="detail-row">
+              <label for="detail-author">저자</label>
+              <input id="detail-author" type="text" />
+            </div>
+            <div class="detail-row">
+              <label for="detail-status">상태</label>
+              <select id="detail-status">
+                <option value="tbr">TBR</option>
+                <option value="reading">읽는 중</option>
+                <option value="done">완독</option>
+                <option value="dnf">DNF</option>
+              </select>
+            </div>
+            <div class="detail-row">
+              <label>별점</label>
+              <div id="detail-rating" class="rating" role="group" aria-label="별점">
+                <button class="star" data-star="1">★</button>
+                <button class="star" data-star="2">★</button>
+                <button class="star" data-star="3">★</button>
+                <button class="star" data-star="4">★</button>
+                <button class="star" data-star="5">★</button>
+              </div>
+              <button id="detail-rating-clear" class="ghost">별점 지우기</button>
+            </div>
+            <div class="detail-row">
+              <label for="detail-date">읽은 날</label>
+              <input id="detail-date" type="date" />
+            </div>
+            <div class="detail-row">
+              <label for="detail-notes">메모</label>
+              <textarea id="detail-notes" rows="4" placeholder="메모를 남겨보세요"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="detail-preview">
+          <div class="preview-title">미리보기</div>
+          <div class="preview-card">
+            <div class="preview-name" id="preview-title"></div>
+            <div class="preview-author" id="preview-author"></div>
+            <div class="preview-meta" id="preview-meta"></div>
+            <div class="preview-notes" id="preview-notes"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button id="detail-delete" class="ghost">삭제</button>
+        <button id="detail-save" class="primary">저장</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
