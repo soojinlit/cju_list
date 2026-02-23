@@ -425,6 +425,41 @@ input, select {
   }
 }
 
+@media (max-width: 520px) {
+  .bottom-bar {
+    gap: 8px;
+    padding: 8px 10px;
+  }
+
+  .bottom-left {
+    gap: 6px;
+  }
+
+  .pager {
+    gap: 6px;
+    padding: 8px 10px;
+  }
+
+  .pager__info {
+    font-size: 12px;
+  }
+
+  .pager__size label {
+    font-size: 12px;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .primary,
+  .ghost {
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 12px;
+  }
+}
+
  
 
 .modal {
