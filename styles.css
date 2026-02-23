@@ -456,8 +456,7 @@ input, select {
   }
 
   .pager__size label {
-    font-size: 11px;
-    white-space: nowrap;
+    display: none;
   }
 
   .actions {
